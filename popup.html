@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Ollama Summarizer</title>
+    <style>
+      body {
+        width: 300px;
+        padding: 10px;
+        font-family: Arial, sans-serif;
+      }
+      .status {
+        margin-bottom: 10px;
+      }
+      #modelSelect {
+        width: 100%;
+        margin-bottom: 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <h2>Ollama Summarizer</h2>
+    <div class="status">
+      <p>
+        Select text on any webpage and right-click to summarize it using Ollama.
+      </p>
+      <label for="modelSelect">Choose Model:</label>
+      <select id="modelSelect">
+        <option value="deepseek-r1:8b">DeepSeek-R1:8B</option>
+      </select>
+    </div>
+    <script src="popup.js"></script>
+  </body>
+</html>
