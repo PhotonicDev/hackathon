@@ -142,3 +142,75 @@ function isRangeInElement(range, element) {
     return false;
   }
 }
+
+// Function to get YouTube video ID from URL
+function getYoutubeVideoId(url) {
+  const urlObj = new URL(url);
+  return urlObj.searchParams.get("v");
+}
+
+// Function to fetch subtitles
+async function fetchYoutubeSubtitles() {
+  try {
+    const videoId = getYoutubeVideoId(window.location.href);
+    if (!videoId) return null;
+
+    // First, get the caption tracks
+    const response = await fetch(`https://www.youtube.com/watch?v=${videoId}`);
+    const html = await response.text();
+
+    // Extract caption URL from player response
+    const playerResponse = JSON.parse(
+      html.split('"captions":')[1].split(',"videoDetails')[0]
+    );
+    const captionTracks =
+      playerResponse.playerCaptionsTracklistRenderer.captionTracks;
+
+    if (!captionTracks || captionTracks.length === 0) {
+      console.log("No captions available");
+      return null;
+    }
+
+    // Prefer English captions
+    const captionTrack =
+      captionTracks.find((track) => track.languageCode === "en") ||
+      captionTracks[0];
+
+    // Fetch the actual captions
+    const captionResponse = await fetch(captionTrack.baseUrl);
+    const captionXml = await captionResponse.text();
+
+    // Parse XML and extract text
+    const parser = new DOMParser();
+    const xmlDoc = parser.parseFromString(captionXml, "text/xml");
+    const textNodes = xmlDoc.getElementsByTagName("text");
+
+    // Combine all caption text
+    let fullText = Array.from(textNodes)
+      .map((node) => node.textContent.trim())
+      .join(" ");
+
+    return fullText;
+  } catch (error) {
+    console.error("Error fetching subtitles:", error);
+    return null;
+  }
+}
+
+// Add message listener for YouTube specific actions
+chrome.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
+  if (message.action === "summarizeYoutube") {
+    const subtitles = await fetchYoutubeSubtitles();
+    if (subtitles) {
+      // Send subtitles back to background script for summarization
+      chrome.runtime.sendMessage({
+        action: "processYoutubeSubtitles",
+        subtitles: subtitles,
+      });
+    } else {
+      alert(
+        "Could not fetch video subtitles. Make sure the video has captions enabled."
+      );
+    }
+  }
+});

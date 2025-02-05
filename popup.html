@@ -12,13 +12,6 @@
         background: #f8f9fa;
       }
 
-      h2 {
-        margin: 0 0 16px 0;
-        color: #1a73e8;
-        font-size: 20px;
-        font-weight: 500;
-      }
-
       .container {
         background: white;
         border-radius: 8px;
@@ -26,44 +19,33 @@
         box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
       }
 
-      .status {
-        margin-bottom: 16px;
+      h2 {
+        margin: 0 0 16px 0;
+        color: #1a73e8;
+        font-size: 20px;
+        font-weight: 500;
       }
 
-      .status p {
-        margin: 0 0 12px 0;
-        color: #5f6368;
-        font-size: 14px;
+      .features {
+        margin-bottom: 20px;
       }
 
       .feature-list {
-        list-style: none;
         padding: 0;
-        margin: 0 0 20px 0;
+        margin: 0;
+        color: #3c4043;
+        font-size: 13px;
       }
 
       .feature-list li {
-        padding: 8px 12px;
-        margin-bottom: 8px;
-        background: #f1f3f4;
-        border-radius: 6px;
-        color: #3c4043;
-        font-size: 13px;
+        padding: 6px 0;
         display: flex;
         align-items: center;
       }
 
-      .feature-list li:before {
-        content: "•";
-        color: #1a73e8;
-        font-weight: bold;
-        margin-right: 8px;
-      }
-
       .model-section {
-        background: #f8f9fa;
-        border-radius: 6px;
-        padding: 12px;
+        padding-top: 12px;
+        border-top: 1px solid #dadce0;
       }
 
       .model-section label {
@@ -101,87 +83,39 @@
         box-shadow: 0 0 0 2px rgba(26, 115, 232, 0.2);
       }
 
-      .loading {
-        color: #5f6368;
-        font-style: italic;
-        font-size: 12px;
+      #modelStatus {
         margin-top: 8px;
+        min-height: 20px;
+        font-size: 12px;
+        color: #5f6368;
       }
 
       .error {
         color: #d93025;
-        font-size: 12px;
-        margin-top: 8px;
-        display: flex;
-        align-items: center;
       }
 
-      .error:before {
-        content: "!";
-        background: #d93025;
-        color: white;
-        width: 14px;
-        height: 14px;
-        border-radius: 50%;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        margin-right: 6px;
-        font-size: 10px;
-        font-weight: bold;
-      }
-
-      #modelStatus {
-        margin-top: 8px;
-        min-height: 20px;
-      }
-
-      .sub-feature-list {
-        list-style: none;
-        padding-left: 24px;
-        margin: 8px 0 0 0;
-      }
-
-      .sub-feature-list li {
-        padding: 4px 8px;
-        margin-bottom: 4px;
-        background: #e8f0fe;
-        font-size: 12px;
-      }
-
-      .sub-feature-list li:before {
-        content: "○";
-        font-size: 10px;
+      .loading {
+        color: #5f6368;
+        font-style: italic;
       }
     </style>
   </head>
   <body>
     <div class="container">
       <h2>Ollama Text Tools</h2>
-      <div class="status">
-        <p>Select text on any webpage and right-click to:</p>
+      <div class="features">
         <ul class="feature-list">
-          <li>Summarize in popup</li>
-          <li>Replace with summary</li>
+          <li>Summarize text</li>
           <li>Translate to English</li>
-          <li>
-            Rewrite in different tones:
-            <ul class="sub-feature-list">
-              <li>Professional</li>
-              <li>Professional (Angry)</li>
-              <li>Passive Aggressive</li>
-              <li>Fun Professional</li>
-              <li>Absolutely Crazy</li>
-            </ul>
-          </li>
+          <li>Rewrite in different tones</li>
         </ul>
-        <div class="model-section">
-          <label for="modelSelect">AI Model</label>
-          <select id="modelSelect">
-            <option value="">Loading available models...</option>
-          </select>
-          <div id="modelStatus" class="loading"></div>
-        </div>
+      </div>
+      <div class="model-section">
+        <label for="modelSelect">AI Model</label>
+        <select id="modelSelect">
+          <option value="">Loading available models...</option>
+        </select>
+        <div id="modelStatus" class="loading"></div>
       </div>
     </div>
     <script src="popup.js"></script>

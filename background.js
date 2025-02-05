@@ -49,6 +49,21 @@ chrome.runtime.onInstalled.addListener(() => {
       contexts: ["selection"],
     });
   });
+
+  // Add separator before YouTube option
+  chrome.contextMenus.create({
+    id: "separator2",
+    type: "separator",
+    contexts: ["page"],
+  });
+
+  // Add YouTube summarize option
+  chrome.contextMenus.create({
+    id: "summarizeYoutube",
+    title: "Summarize YouTube Video",
+    contexts: ["page"],
+    documentUrlPatterns: ["https://www.youtube.com/watch?v=*"],
+  });
 });
 
 async function getSummary(text, model) {
@@ -167,6 +182,9 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
     } else if (info.menuItemId === "summarizeTextPopup") {
       data = await getSummary(selectedText, model);
       title = "Summary";
+    } else if (info.menuItemId === "summarizeYoutube") {
+      chrome.tabs.sendMessage(tab.id, { action: "summarizeYoutube" });
+      return;
     } else {
       data = await getSummary(selectedText, model);
     }
@@ -205,5 +223,57 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
     alert(
       "Error connecting to Ollama. Make sure it's running on localhost:11434"
     );
+  }
+});
+
+// Add message listener for subtitle processing
+chrome.runtime.onMessage.addListener(async (message, sender) => {
+  if (message.action === "processYoutubeSubtitles") {
+    try {
+      const result = await chrome.storage.local.get(["model"]);
+      const model = result.model || "qwen2.5:3b";
+
+      const response = await fetch("http://localhost:11434/api/generate", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Access-Control-Allow-Origin": "*",
+          Origin: "chrome-extension://" + chrome.runtime.id,
+        },
+        body: JSON.stringify({
+          model: model,
+          prompt: `Please provide a concise summary of this YouTube video based on its subtitles:\n\n${message.subtitles}`,
+          stream: false,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+
+      // Show summary in popup
+      chrome.windows.create(
+        {
+          url: `summary.html?title=${encodeURIComponent("Video Summary")}`,
+          type: "popup",
+          width: 400,
+          height: 300,
+        },
+        (window) => {
+          setTimeout(() => {
+            chrome.tabs.sendMessage(window.tabs[0].id, {
+              action: "showSummary",
+              summary: data.response,
+              title: "Video Summary",
+            });
+          }, 100);
+        }
+      );
+    } catch (error) {
+      console.error("Error processing subtitles:", error);
+      alert("Error processing video subtitles. Please try again.");
+    }
   }
 });

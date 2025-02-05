@@ -1,17 +1,22 @@
 {
   "manifest_version": 3,
-  "name": "Ollama Text Summarizer",
+  "name": "Ollama Text Tools",
   "version": "1.0",
-  "description": "Summarize selected text using local Ollama LLM",
-  "permissions": ["contextMenus", "storage", "tabs"],
-  "host_permissions": ["http://localhost:11434/*", "http://localhost/*"],
+  "description": "Summarize text using local Ollama LLM",
+  "permissions": ["contextMenus", "storage", "tabs", "activeTab"],
+  "host_permissions": [
+    "http://localhost:11434/*",
+    "http://localhost/*",
+    "https://www.youtube.com/*",
+    "https://*.googlevideo.com/*"
+  ],
   "background": {
     "service_worker": "background.js",
     "type": "module"
   },
   "content_scripts": [
     {
-      "matches": ["<all_urls>"],
+      "matches": ["https://www.youtube.com/*"],
       "js": ["content.js"]
     }
   ],
